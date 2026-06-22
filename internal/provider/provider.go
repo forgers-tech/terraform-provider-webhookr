@@ -6,6 +6,7 @@ import (
 
 	"github.com/forgers-tech/terraform-provider-webhookr/internal/auth"
 	"github.com/forgers-tech/terraform-provider-webhookr/internal/client"
+	tfresource "github.com/forgers-tech/terraform-provider-webhookr/internal/resource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
@@ -111,7 +112,9 @@ func (p *WebhookrProvider) Configure(ctx context.Context, req provider.Configure
 }
 
 func (p *WebhookrProvider) Resources(_ context.Context) []func() resource.Resource {
-	return []func() resource.Resource{}
+	return []func() resource.Resource{
+		tfresource.NewProjectResource,
+	}
 }
 
 func (p *WebhookrProvider) DataSources(_ context.Context) []func() datasource.DataSource {
