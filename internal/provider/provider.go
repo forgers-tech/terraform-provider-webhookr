@@ -114,6 +114,7 @@ func (p *WebhookrProvider) Configure(ctx context.Context, req provider.Configure
 func (p *WebhookrProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		tfresource.NewProjectResource,
+		tfresource.NewEndpointResource,
 	}
 }
 
