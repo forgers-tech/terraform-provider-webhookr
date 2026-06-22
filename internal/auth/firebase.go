@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	customTokenAudience = "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit"
+	customTokenAudience = "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit" // #nosec G101 -- Google API audience URL, not a credential
 	signInURL           = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken"
 	refreshURL          = "https://securetoken.googleapis.com/v1/token"
 
