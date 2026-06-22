@@ -1,0 +1,22 @@
+# Provider binary
+terraform-provider-webhookr
+terraform-provider-webhookr.exe
+
+# Go
+vendor/
+*.test
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.lock.hcl
+terraform.tfvars
+
+# goreleaser
+dist/
+
+# Environment / secrets
+.env
+*.env
