@@ -105,7 +105,7 @@ func (c *FirebaseClient) signIn(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("sign-in request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	var result struct {
 		IDToken      string `json:"idToken"`
@@ -118,7 +118,7 @@ func (c *FirebaseClient) signIn(ctx context.Context) error {
 		return fmt.Errorf("decoding sign-in response: %w", err)
 	}
 	if result.Error != nil {
-		return fmt.Errorf("Firebase sign-in error: %s", result.Error.Message)
+		return fmt.Errorf("firebase sign-in error: %s", result.Error.Message)
 	}
 	c.idToken = result.IDToken
 	c.refreshToken = result.RefreshToken
@@ -143,7 +143,7 @@ func (c *FirebaseClient) refresh(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("token refresh returned status %d", resp.StatusCode)
