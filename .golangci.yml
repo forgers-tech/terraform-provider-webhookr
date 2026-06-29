@@ -10,5 +10,8 @@ linters:
     - errcheck
     - staticcheck
     - ineffassign
-    - gofmt
     - misspell
+
+formatters:
+  enable:
+    - gofmt
