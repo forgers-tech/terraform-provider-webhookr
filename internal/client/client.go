@@ -67,7 +67,7 @@ func (c *Client) Do(ctx context.Context, method, path string, body, out any) (in
 	if err != nil {
 		return 0, fmt.Errorf("%s %s: %w", method, path, err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	if resp.StatusCode >= http.StatusBadRequest {
 		raw, _ := io.ReadAll(resp.Body)
