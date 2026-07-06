@@ -44,3 +44,16 @@ reusable engineering standard — update the corresponding artifact, explaining 
 decision exists rather than duplicating the implementation. Durable rationale lives in
 `webhookr-artifacts/engineering` (or `marketing/`); operational docs live next to the code and
 cross-link to the store artifact.
+
+## Branch & working-tree hygiene
+
+Start **and** finish every task on a clean tree, so the next agent never inherits a dirty
+environment.
+
+- **Start from a fresh `main`.** Run `git checkout main && git pull` before anything, then
+  branch: `git checkout -b <type>/<short-slug>`. Never commit or push directly to `main`.
+- **One branch → one PR → one concern**, following this repo's PR standard (always via PR,
+  scoped to a single change, never mixing unrelated work).
+- **Finish clean.** After the PR is merged, return the local repo to an updated `main` and drop
+  the merged branch: `git checkout main && git pull && git branch -d <branch>`. Leave no stray
+  branches, stashes, or uncommitted changes behind.
