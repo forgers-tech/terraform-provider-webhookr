@@ -1,11 +1,20 @@
 name: OpenSSF Scorecard
 
-# This is the org's only public repository, and the only artifact outsiders
-# actually consume — so it is the one place where Scorecard both works and is
-# read by someone other than us. It had no security scanning at all.
+# Inlined rather than calling forgers-tech/github-workflows, because that repo
+# is PRIVATE and this one is PUBLIC — GitHub does not let a public repository
+# consume a reusable workflow from a private one, whatever the org's Actions
+# access setting says. The call failed as a "workflow file issue" with no job
+# ever starting.
 #
-# Scorecard needs no PAT here: on a public repo the default GITHUB_TOKEN is
-# enough, and publish_results can populate the public scorecard badge.
+# That is not a loss here: this is the org's only public repo, so there is
+# nothing to share the definition with. The private repos keep using the shared
+# workflow, which now skips them (github-workflows#18) because Scorecard cannot
+# analyse a private repo without a static PAT.
+#
+# What Scorecard adds over gosec / golangci-lint / CodeQL, all already running
+# in ci.yml: posture rather than code — branch protection, pinned action
+# digests, dangerous workflow patterns, token permissions, release signing.
+# A consumer of a published Terraform provider has no other way to check those.
 on:
   push:
     branches: [main]
@@ -14,9 +23,23 @@ on:
 
 jobs:
   scorecard:
-    uses: forgers-tech/github-workflows/.github/workflows/scorecard.yml@main
+    name: Scorecard Analysis
+    runs-on: ubuntu-latest
     permissions:
       security-events: write
       id-token: write
       contents: read
       actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ossf/scorecard-action@v2.4.0
+        with:
+          results_file: scorecard-results.sarif
+          results_format: sarif
+          publish_results: true
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: scorecard-results.sarif
+          category: scorecard
