@@ -1,0 +1,24 @@
+name: OpenSSF Scorecard
+
+# This is the org's only public repository, and the only artifact outsiders
+# actually consume — so it is the one place where Scorecard both works and is
+# read by someone other than us. It had no security scanning at all.
+#
+# Scorecard needs no PAT here: on a public repo the default GITHUB_TOKEN is
+# enough, and publish_results can populate the public scorecard badge.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * 1"
+
+permissions: read-all
+
+jobs:
+  scorecard:
+    uses: forgers-tech/github-workflows/.github/workflows/scorecard.yml@main
+    permissions:
+      security-events: write
+      id-token: write
+      contents: read
+      actions: read
