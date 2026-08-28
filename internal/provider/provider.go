@@ -131,6 +131,7 @@ func (p *WebhookrProvider) Resources(_ context.Context) []func() resource.Resour
 		tfresource.NewProjectResource,
 		tfresource.NewEndpointResource,
 		tfresource.NewEndpointHmacResource,
+		tfresource.NewEndpointProviderVerificationResource,
 		tfresource.NewDestinationResource,
 	}
 }

@@ -7,6 +7,7 @@ import (
 	tfprovider "github.com/forgers-tech/terraform-provider-webhookr/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
 func TestWebhookrProvider_Metadata(t *testing.T) {
@@ -75,6 +76,35 @@ func TestWebhookrProvider_Schema(t *testing.T) {
 		}
 		if !sa.Sensitive {
 			t.Errorf("attribute %s should be Sensitive", name)
+		}
+	}
+}
+
+// A resource that compiles but is not returned here is unreachable from any
+// configuration, and nothing else in the suite would notice.
+func TestWebhookrProvider_Resources(t *testing.T) {
+	p := tfprovider.New("1.0.0")()
+
+	registered := map[string]bool{}
+	for _, newResource := range p.Resources(context.Background()) {
+		var resp resource.MetadataResponse
+		newResource().Metadata(
+			context.Background(),
+			resource.MetadataRequest{ProviderTypeName: "webhookr"},
+			&resp,
+		)
+		registered[resp.TypeName] = true
+	}
+
+	for _, name := range []string{
+		"webhookr_project",
+		"webhookr_endpoint",
+		"webhookr_endpoint_hmac",
+		"webhookr_endpoint_provider_verification",
+		"webhookr_destination",
+	} {
+		if !registered[name] {
+			t.Errorf("resource %s is not registered on the provider", name)
 		}
 	}
 }
