@@ -185,10 +185,6 @@ func TestEndpointHmacResource_UpdateKeepsTheExistingSecret(t *testing.T) {
 	defer srv.Close()
 
 	r, s := hmacResource(t, srv)
-	updatable, ok := r.(resource.Resource)
-	if !ok {
-		t.Fatal("resource does not implement Update")
-	}
 
 	state := hmacValue(t, s, map[string]*string{
 		"project_id":  str(hmacProjectID),
@@ -206,7 +202,7 @@ func TestEndpointHmacResource_UpdateKeepsTheExistingSecret(t *testing.T) {
 
 	var updateResp resource.UpdateResponse
 	updateResp.State = tfsdk.State{Schema: s}
-	updatable.Update(context.Background(), resource.UpdateRequest{
+	r.Update(context.Background(), resource.UpdateRequest{
 		Plan:  tfsdk.Plan{Schema: s, Raw: plan},
 		State: tfsdk.State{Schema: s, Raw: state},
 	}, &updateResp)
