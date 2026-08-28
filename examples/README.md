@@ -10,6 +10,7 @@ so these files double as the source for generated documentation.
 | `provider/` | Provider configuration — API-token auth and the Firebase service-account alternative. |
 | `resources/webhookr_project/` | Minimal `webhookr_project`. |
 | `resources/webhookr_endpoint/` | An endpoint and its generated `slug`. |
+| `resources/webhookr_endpoint_hmac/` | HMAC signature verification on an endpoint, generated or bring-your-own secret. |
 | `resources/webhookr_destination/` | A destination with headers and delivery options. |
 | `complete/` | A full project → endpoints → destinations topology with outputs. |
 
