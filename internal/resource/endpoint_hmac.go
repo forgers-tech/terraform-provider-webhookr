@@ -145,12 +145,12 @@ func (r *EndpointHmacResource) Read(ctx context.Context, req resource.ReadReques
 	path := endpointPath(state.ProjectID.ValueString(), state.EndpointID.ValueString())
 	var result endpointHmacReadResponse
 	status, err := r.client.Do(ctx, http.MethodGet, path, nil, &result)
-	if err != nil {
-		resp.Diagnostics.AddError("Error reading endpoint HMAC configuration", err.Error())
-		return
-	}
 	if status == http.StatusNotFound {
 		resp.State.RemoveResource(ctx)
+		return
+	}
+	if err != nil {
+		resp.Diagnostics.AddError("Error reading endpoint HMAC configuration", err.Error())
 		return
 	}
 	if status != http.StatusOK {
@@ -205,11 +205,11 @@ func (r *EndpointHmacResource) Delete(ctx context.Context, req resource.DeleteRe
 
 	path := endpointHmacPath(state.ProjectID.ValueString(), state.EndpointID.ValueString())
 	status, err := r.client.Do(ctx, http.MethodDelete, path, nil, nil)
-	if err != nil {
-		resp.Diagnostics.AddError("Error disabling endpoint HMAC verification", err.Error())
+	if status == http.StatusNotFound || status == http.StatusOK {
 		return
 	}
-	if status == http.StatusNotFound || status == http.StatusOK {
+	if err != nil {
+		resp.Diagnostics.AddError("Error disabling endpoint HMAC verification", err.Error())
 		return
 	}
 	resp.Diagnostics.AddError("Unexpected status disabling endpoint HMAC verification",

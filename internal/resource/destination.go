@@ -195,12 +195,12 @@ func (r *DestinationResource) Read(ctx context.Context, req resource.ReadRequest
 	path := destinationPath(state.ProjectID.ValueString(), state.EndpointID.ValueString(), state.ID.ValueString())
 	var result destinationAPIResponse
 	status, err := r.client.Do(ctx, http.MethodGet, path, nil, &result)
-	if err != nil {
-		resp.Diagnostics.AddError("Error reading destination", err.Error())
-		return
-	}
 	if status == http.StatusNotFound {
 		resp.State.RemoveResource(ctx)
+		return
+	}
+	if err != nil {
+		resp.Diagnostics.AddError("Error reading destination", err.Error())
 		return
 	}
 	if status != http.StatusOK {
@@ -266,11 +266,11 @@ func (r *DestinationResource) Delete(ctx context.Context, req resource.DeleteReq
 
 	path := destinationPath(state.ProjectID.ValueString(), state.EndpointID.ValueString(), state.ID.ValueString())
 	status, err := r.client.Do(ctx, http.MethodDelete, path, nil, nil)
-	if err != nil {
-		resp.Diagnostics.AddError("Error deleting destination", err.Error())
+	if status == http.StatusNotFound {
 		return
 	}
-	if status == http.StatusNotFound {
+	if err != nil {
+		resp.Diagnostics.AddError("Error deleting destination", err.Error())
 		return
 	}
 	if status != http.StatusOK {

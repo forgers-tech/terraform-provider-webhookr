@@ -116,12 +116,12 @@ func (r *ProjectResource) Read(ctx context.Context, req resource.ReadRequest, re
 
 	var result projectAPIResponse
 	status, err := r.client.Do(ctx, http.MethodGet, "/v1/projects/"+state.ID.ValueString(), nil, &result)
-	if err != nil {
-		resp.Diagnostics.AddError("Error reading project", err.Error())
-		return
-	}
 	if status == http.StatusNotFound {
 		resp.State.RemoveResource(ctx)
+		return
+	}
+	if err != nil {
+		resp.Diagnostics.AddError("Error reading project", err.Error())
 		return
 	}
 	if status != http.StatusOK {
@@ -170,11 +170,11 @@ func (r *ProjectResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	status, err := r.client.Do(ctx, http.MethodDelete, "/v1/projects/"+state.ID.ValueString(), nil, nil)
-	if err != nil {
-		resp.Diagnostics.AddError("Error deleting project", err.Error())
+	if status == http.StatusNotFound {
 		return
 	}
-	if status == http.StatusNotFound {
+	if err != nil {
+		resp.Diagnostics.AddError("Error deleting project", err.Error())
 		return
 	}
 	if status != http.StatusOK {

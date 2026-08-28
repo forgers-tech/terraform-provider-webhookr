@@ -39,6 +39,10 @@ func New(baseURL string, auth Tokener) *Client {
 //
 // Returns the HTTP status code so callers can handle 404 (resource deleted outside
 // Terraform) without treating it as a fatal error.
+//
+// Any status >= 400 comes back as BOTH a status and a non-nil error, so a caller
+// that wants to act on a specific status must check it BEFORE the error —
+// checking `err != nil` first makes every status branch below it dead code.
 func (c *Client) Do(ctx context.Context, method, path string, body, out any) (int, error) {
 	token, err := c.auth.Token(ctx)
 	if err != nil {
