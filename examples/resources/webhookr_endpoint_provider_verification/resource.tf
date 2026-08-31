@@ -30,3 +30,23 @@ variable "stripe_webhook_signing_secret" {
 # An endpoint has exactly one verification strategy. Declaring both this and
 # `webhookr_endpoint_hmac` for the same endpoint is refused by the API with a
 # 409 rather than one silently replacing the other.
+
+# GitHub works the same way. Its scheme is HMAC-SHA256 over the raw body under
+# `X-Hub-Signature-256`, so Webhookr needs no vendor SDK for it — only the
+# secret you set on the repository or organisation webhook.
+resource "webhookr_endpoint" "github" {
+  project_id = webhookr_project.example.id
+  name       = "github-webhook"
+}
+
+resource "webhookr_endpoint_provider_verification" "github" {
+  project_id    = webhookr_project.example.id
+  endpoint_id   = webhookr_endpoint.github.id
+  provider_name = "github"
+  secret        = var.github_webhook_secret
+}
+
+variable "github_webhook_secret" {
+  type      = string
+  sensitive = true
+}

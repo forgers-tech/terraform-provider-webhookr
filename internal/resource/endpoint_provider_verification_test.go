@@ -295,7 +295,7 @@ func TestEndpointProviderVerificationResource_ValidateConfigRejectsUnsupportedPr
 	config := providerVerificationValue(t, s, map[string]*string{
 		"project_id":    str(hmacProjectID),
 		"endpoint_id":   str(hmacEndpointID),
-		"provider_name": str("github"),
+		"provider_name": str("shopify"),
 		"secret":        str(stripeSigningSecret),
 	})
 
@@ -306,6 +306,38 @@ func TestEndpointProviderVerificationResource_ValidateConfigRejectsUnsupportedPr
 
 	if !validateResp.Diagnostics.HasError() {
 		t.Fatal("expected an unsupported provider to be rejected at plan time")
+	}
+}
+
+func TestEndpointProviderVerificationResource_ValidateConfigAcceptsEverySupportedProvider(t *testing.T) {
+	r := tfresource.NewEndpointProviderVerificationResource()
+	var schemaResp resource.SchemaResponse
+	r.Schema(context.Background(), resource.SchemaRequest{}, &schemaResp)
+	s := schemaResp.Schema
+
+	validatable, ok := r.(resource.ResourceWithValidateConfig)
+	if !ok {
+		t.Fatal("resource does not implement ResourceWithValidateConfig")
+	}
+
+	// Every name the provider claims to support must actually pass validation,
+	// so the list and the check cannot drift apart.
+	for _, name := range []string{"stripe", "github"} {
+		config := providerVerificationValue(t, s, map[string]*string{
+			"project_id":    str(hmacProjectID),
+			"endpoint_id":   str(hmacEndpointID),
+			"provider_name": str(name),
+			"secret":        str(stripeSigningSecret),
+		})
+
+		var validateResp resource.ValidateConfigResponse
+		validatable.ValidateConfig(context.Background(), resource.ValidateConfigRequest{
+			Config: tfsdk.Config{Schema: s, Raw: config},
+		}, &validateResp)
+
+		if validateResp.Diagnostics.HasError() {
+			t.Errorf("%s must be accepted: %v", name, validateResp.Diagnostics)
+		}
 	}
 }
 

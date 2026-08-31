@@ -24,7 +24,7 @@ var (
 // Providers whose signature scheme the Webhookr ingest edge can verify. Adding
 // one here without the matching verifier in webhookr-ingest would produce an
 // endpoint that rejects every request as unverifiable.
-var supportedVerificationProviders = []string{"stripe"}
+var supportedVerificationProviders = []string{"stripe", "github"}
 
 type EndpointProviderVerificationResource struct {
 	client *client.Client
@@ -62,8 +62,8 @@ func (r *EndpointProviderVerificationResource) Metadata(_ context.Context, req r
 func (r *EndpointProviderVerificationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description: "Verifies inbound requests to a Webhookr endpoint against a provider's own " +
-			"signature scheme — Stripe today. Requests that do not verify are rejected at the " +
-			"ingest edge and never enqueued.\n\n" +
+			"signature scheme — Stripe and GitHub today. Requests that do not verify are rejected " +
+			"at the ingest edge and never enqueued.\n\n" +
 			"An endpoint has exactly one verification strategy. Configuring this on an endpoint " +
 			"that already uses `webhookr_endpoint_hmac` is refused by the API; destroy that " +
 			"resource first.\n\n" +
@@ -100,9 +100,10 @@ func (r *EndpointProviderVerificationResource) Schema(_ context.Context, _ resou
 				Required:  true,
 				Sensitive: true,
 				Description: "The provider's webhook signing secret — for Stripe, the `whsec_…` " +
-					"value shown on the webhook endpoint in the Stripe Dashboard. Webhookr never " +
-					"returns it, so Terraform cannot detect a change made outside Terraform; " +
-					"changing it here re-keys the endpoint immediately.",
+					"value shown on the webhook endpoint in the Stripe Dashboard; for GitHub, the " +
+					"secret set on the repository or organisation webhook. Webhookr never returns " +
+					"it, so Terraform cannot detect a change made outside Terraform; changing it " +
+					"here re-keys the endpoint immediately.",
 			},
 		},
 	}
