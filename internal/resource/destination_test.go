@@ -21,10 +21,27 @@ func testDestination() map[string]interface{} {
 		"method":      "POST",
 		"headers":     map[string]interface{}{"X-API-Key": "secret"},
 		"contentType": "application/json",
-		"timeoutMs":   float64(30000),
-		"isEnabled":   true,
-		"createdAt":   "2024-01-01T00:00:00.000Z",
-		"updatedAt":   "2024-01-01T00:00:00.000Z",
+		"timeoutMs":   nil,
+		"retryPolicy": map[string]interface{}{
+			"maxRetries":        float64(3),
+			"initialIntervalMs": nil,
+			"backoffStrategy":   nil,
+			"backoffMultiplier": nil,
+			"maxIntervalMs":     nil,
+			"jitter":            nil,
+		},
+		"effectiveRetryPolicy": map[string]interface{}{
+			"maxRetries":        float64(3),
+			"initialIntervalMs": float64(10000),
+			"backoffStrategy":   "exponential",
+			"backoffMultiplier": float64(2),
+			"maxIntervalMs":     float64(300000),
+			"jitter":            true,
+			"timeoutMs":         float64(30000),
+		},
+		"isEnabled": true,
+		"createdAt": "2024-01-01T00:00:00.000Z",
+		"updatedAt": "2024-01-01T00:00:00.000Z",
 	}
 }
 
@@ -49,6 +66,7 @@ func TestDestinationResource_Schema(t *testing.T) {
 	for _, attr := range []string{
 		"id", "project_id", "endpoint_id", "name", "url",
 		"method", "headers", "content_type", "timeout_ms", "is_enabled",
+		"retry_policy", "effective_retry_policy",
 		"created_at", "updated_at",
 	} {
 		if _, ok := attrs[attr]; !ok {

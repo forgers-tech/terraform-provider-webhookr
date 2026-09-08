@@ -72,6 +72,26 @@ resource "webhookr_destination" "orders_backup" {
   is_enabled = false
 }
 
+# A receiver known to be slow to recover: fewer, longer-spaced attempts than
+# the platform default, and a longer window for each one.
+resource "webhookr_destination" "orders_partner" {
+  project_id  = webhookr_project.shop.id
+  endpoint_id = webhookr_endpoint.orders.id
+
+  name       = "orders-partner"
+  url        = "https://partner.example.com/hooks/orders"
+  timeout_ms = 45000
+
+  retry_policy = {
+    max_retries         = 8
+    initial_interval_ms = 30000
+    backoff_strategy    = "exponential"
+    backoff_multiplier  = 2
+    max_interval_ms     = 900000
+    jitter              = true
+  }
+}
+
 resource "webhookr_destination" "payments_primary" {
   project_id  = webhookr_project.shop.id
   endpoint_id = webhookr_endpoint.payments.id
